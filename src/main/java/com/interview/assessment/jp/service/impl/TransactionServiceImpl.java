@@ -73,7 +73,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .amount(request.getAmount())
                 .description(request.getDescription())
                 .transactionDate(LocalDateTime.now())
-                .accountId(accountId)
+                .account(account)
                 .build();
 
         Transaction createdTransaction = mockDataService.createTransaction(transaction);
@@ -91,7 +91,7 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         // Verify transaction belongs to current user's account
-        Account account = mockDataService.getAccountById(transaction.getAccountId());
+        Account account = transaction.getAccount();
         if (!account.getUserId().equals(currentUser.getId())) {
             throw new ResourceNotFoundException("Transaction not found");
         }
@@ -112,7 +112,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .amount(transaction.getAmount())
                 .description(transaction.getDescription())
                 .transactionDate(transaction.getTransactionDate())
-                .accountId(transaction.getAccountId())
+                .accountId(transaction.getAccount().getId())
                 .build();
     }
 }

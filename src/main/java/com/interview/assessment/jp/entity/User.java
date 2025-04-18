@@ -1,48 +1,48 @@
 package com.interview.assessment.jp.entity;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 /**
- * User Entity
+ * User entity representing a banking application user
  */
+@Entity
+@Table(name = "users")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
-    /**
-     * User ID
-     */
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Username
-     */
+    @Column(unique = true, nullable = false)
     private String username;
 
-    /**
-     * Password (encrypted)
-     */
+    @Column(nullable = false)
     private String password;
 
-    /**
-     * User Roles
-     */
-    private List<String> roles;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    @Builder.Default
+    private List<String> roles = new ArrayList<>();
 
-    /**
-     * Created At
-     */
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    /**
-     * Updated At
-     */
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 }

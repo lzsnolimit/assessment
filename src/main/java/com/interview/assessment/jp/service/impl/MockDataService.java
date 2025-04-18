@@ -40,20 +40,18 @@ public class MockDataService {
                 // Create users
                 User user1 = User.builder()
                                 .id(userIdGenerator.getAndIncrement())
-                                .username("user1")
-                                .password("$2a$10$X7uKQvU9umcaHbKl0.uZS.B5o9.D8Ff5UlE/mfm2iDQMIFhsZcqJy") // encrypted
-                                                                                                          // "password"
-                                .roles(Arrays.asList("USER", "new_app_role"))
+                                .username("john.doe")
+                                .password("password")
+                                .roles(List.of("USER"))
                                 .createdAt(LocalDateTime.now())
                                 .updatedAt(LocalDateTime.now())
                                 .build();
 
                 User user2 = User.builder()
                                 .id(userIdGenerator.getAndIncrement())
-                                .username("user2")
-                                .password("$2a$10$X7uKQvU9umcaHbKl0.uZS.B5o9.D8Ff5UlE/mfm2iDQMIFhsZcqJy") // encrypted
-                                                                                                          // "password"
-                                .roles(Arrays.asList("USER"))
+                                .username("jane.smith")
+                                .password("password")
+                                .roles(List.of("USER"))
                                 .createdAt(LocalDateTime.now())
                                 .updatedAt(LocalDateTime.now())
                                 .build();
@@ -67,7 +65,7 @@ public class MockDataService {
                                 .accountNumber("SAV-" + System.currentTimeMillis())
                                 .balance(new BigDecimal("5000.00"))
                                 .accountType(AccountType.SAVINGS)
-                                .userId(user1.getId())
+                                .user(user1)
                                 .createdAt(LocalDateTime.now())
                                 .updatedAt(LocalDateTime.now())
                                 .build();
@@ -77,7 +75,7 @@ public class MockDataService {
                                 .accountNumber("CHK-" + System.currentTimeMillis())
                                 .balance(new BigDecimal("2500.50"))
                                 .accountType(AccountType.CHECKING)
-                                .userId(user1.getId())
+                                .user(user1)
                                 .createdAt(LocalDateTime.now())
                                 .updatedAt(LocalDateTime.now())
                                 .build();
@@ -87,7 +85,7 @@ public class MockDataService {
                                 .accountNumber("CRE-" + System.currentTimeMillis())
                                 .balance(new BigDecimal("1000.00"))
                                 .accountType(AccountType.CREDIT)
-                                .userId(user1.getId())
+                                .user(user1)
                                 .createdAt(LocalDateTime.now())
                                 .updatedAt(LocalDateTime.now())
                                 .build();
@@ -108,7 +106,7 @@ public class MockDataService {
                                 .accountNumber("SAV-" + System.currentTimeMillis())
                                 .balance(new BigDecimal("3000.00"))
                                 .accountType(AccountType.SAVINGS)
-                                .userId(user2.getId())
+                                .user(user2)
                                 .createdAt(LocalDateTime.now())
                                 .updatedAt(LocalDateTime.now())
                                 .build();
@@ -128,7 +126,7 @@ public class MockDataService {
                                 .amount(new BigDecimal("1000.00"))
                                 .description("Salary payment")
                                 .transactionDate(LocalDateTime.now().minusDays(5))
-                                .accountId(savingsAccount.getId())
+                                .account(savingsAccount)
                                 .createdAt(LocalDateTime.now().minusDays(5))
                                 .updatedAt(LocalDateTime.now().minusDays(5))
                                 .build();
@@ -139,7 +137,7 @@ public class MockDataService {
                                 .amount(new BigDecimal("500.00"))
                                 .description("Shopping expense")
                                 .transactionDate(LocalDateTime.now().minusDays(3))
-                                .accountId(savingsAccount.getId())
+                                .account(savingsAccount)
                                 .createdAt(LocalDateTime.now().minusDays(3))
                                 .updatedAt(LocalDateTime.now().minusDays(3))
                                 .build();
@@ -150,7 +148,7 @@ public class MockDataService {
                                 .amount(new BigDecimal("200.00"))
                                 .description("Refund")
                                 .transactionDate(LocalDateTime.now().minusDays(1))
-                                .accountId(savingsAccount.getId())
+                                .account(savingsAccount)
                                 .createdAt(LocalDateTime.now().minusDays(1))
                                 .updatedAt(LocalDateTime.now().minusDays(1))
                                 .build();
@@ -173,7 +171,7 @@ public class MockDataService {
                                 .amount(new BigDecimal("300.00"))
                                 .description("Restaurant bill")
                                 .transactionDate(LocalDateTime.now().minusDays(4))
-                                .accountId(checkingAccount.getId())
+                                .account(checkingAccount)
                                 .createdAt(LocalDateTime.now().minusDays(4))
                                 .updatedAt(LocalDateTime.now().minusDays(4))
                                 .build();
@@ -184,7 +182,7 @@ public class MockDataService {
                                 .amount(new BigDecimal("150.00"))
                                 .description("Movie tickets")
                                 .transactionDate(LocalDateTime.now().minusDays(2))
-                                .accountId(checkingAccount.getId())
+                                .account(checkingAccount)
                                 .createdAt(LocalDateTime.now().minusDays(2))
                                 .updatedAt(LocalDateTime.now().minusDays(2))
                                 .build();
@@ -260,13 +258,13 @@ public class MockDataService {
 
                 transactionMap.put(transaction.getId(), transaction);
 
-                List<Transaction> transactions = accountTransactionsMap.getOrDefault(transaction.getAccountId(),
-                                new ArrayList<>());
+                Long accountId = transaction.getAccount().getId();
+                List<Transaction> transactions = accountTransactionsMap.getOrDefault(accountId, new ArrayList<>());
                 transactions.add(transaction);
-                accountTransactionsMap.put(transaction.getAccountId(), transactions);
+                accountTransactionsMap.put(accountId, transactions);
 
                 // Update account balance
-                Account account = accountMap.get(transaction.getAccountId());
+                Account account = accountMap.get(accountId);
                 if (account != null) {
                         if (transaction.getTransactionType() == TransactionType.CREDIT) {
                                 account.setBalance(account.getBalance().add(transaction.getAmount()));

@@ -1,54 +1,65 @@
 package com.interview.assessment.jp.entity;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import com.interview.assessment.jp.enums.AccountType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 /**
- * Account Entity
+ * Account entity representing a bank account
  */
+@Entity
+@Table(name = "accounts")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Account {
-    /**
-     * Account ID
-     */
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Account Number
-     */
+    @Column(unique = true, nullable = false)
     private String accountNumber;
 
-    /**
-     * Account Balance
-     */
+    @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal balance;
 
-    /**
-     * Account Type
-     */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private AccountType accountType;
 
-    /**
-     * User ID
-     */
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Transient
     private Long userId;
 
-    /**
-     * Created At
-     */
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    /**
-     * Updated At
-     */
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    /**
+     * Get user ID
+     * 
+     * @return User ID
+     */
+    public Long getUserId() {
+        if (userId != null) {
+            return userId;
+        }
+        return user != null ? user.getId() : null;
+    }
 }

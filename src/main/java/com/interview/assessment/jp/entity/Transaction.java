@@ -1,59 +1,67 @@
 package com.interview.assessment.jp.entity;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import com.interview.assessment.jp.enums.TransactionType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 /**
- * Transaction Entity
+ * Transaction entity representing a bank account transaction
  */
+@Entity
+@Table(name = "transactions")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Transaction {
-    /**
-     * Transaction ID
-     */
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Transaction Type
-     */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private TransactionType transactionType;
 
-    /**
-     * Transaction Amount
-     */
+    @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
 
-    /**
-     * Transaction Description
-     */
     private String description;
 
-    /**
-     * Transaction Date
-     */
+    @Column(nullable = false)
     private LocalDateTime transactionDate;
 
-    /**
-     * Account ID
-     */
+    @ManyToOne
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
+
+    @Transient
     private Long accountId;
 
-    /**
-     * Created At
-     */
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    /**
-     * Updated At
-     */
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    /**
+     * Get account ID
+     * 
+     * @return Account ID
+     */
+    public Long getAccountId() {
+        if (accountId != null) {
+            return accountId;
+        }
+        return account != null ? account.getId() : null;
+    }
 }
