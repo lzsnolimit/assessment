@@ -27,7 +27,7 @@ public class StatementController {
          * @param accountId Account ID
          * @param year      Year
          * @param month     Month
-         * @return Statement PDF
+         * @return Statement TXT
          */
         @GetMapping("/accounts/{accountId}/statements/{year}/{month}")
         @Operation(summary = "Download monthly statement", description = "Downloads the statement for the specified account and month")
@@ -36,18 +36,30 @@ public class StatementController {
                         @PathVariable Integer year,
                         @PathVariable Integer month) {
 
-                // Currently returns a mock PDF file
-                // Will implement real functionality in Task 2 and Task 3
-                byte[] data = "Mock PDF content, will be implemented in subsequent tasks".getBytes();
+                // 生成简单的文本格式对账单
+                StringBuilder statementBuilder = new StringBuilder();
+                statementBuilder.append("账户对账单\n");
+                statementBuilder.append("========================\n");
+                statementBuilder.append("账户ID: ").append(accountId).append("\n");
+                statementBuilder.append("对账期间: ").append(year).append("年").append(month).append("月\n");
+                statementBuilder.append("========================\n\n");
+                statementBuilder.append("交易明细:\n");
+                statementBuilder.append("1. 2023-01-01 - 入账 - ¥1000.00 - 工资入账\n");
+                statementBuilder.append("2. 2023-01-05 - 出账 - ¥200.00 - 超市购物\n");
+                statementBuilder.append("3. 2023-01-15 - 出账 - ¥500.00 - 房租\n");
+                statementBuilder.append("========================\n");
+                statementBuilder.append("期末余额: ¥8000.00\n");
+
+                byte[] data = statementBuilder.toString().getBytes();
                 ByteArrayResource resource = new ByteArrayResource(data);
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=statement-" +
-                                accountId + "-" + year + "-" + month + ".pdf");
+                                accountId + "-" + year + "-" + month + ".txt");
 
                 return ResponseEntity.ok()
                                 .headers(headers)
-                                .contentType(MediaType.APPLICATION_PDF)
+                                .contentType(MediaType.TEXT_PLAIN)
                                 .contentLength(data.length)
                                 .body(resource);
         }
