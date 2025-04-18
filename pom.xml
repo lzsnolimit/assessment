@@ -11,7 +11,7 @@
 	<groupId>com.interview.assessment</groupId>
 	<artifactId>assessment</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>assessment</name>
+	<n>assessment</n>
 	<description>assessment project</description>
 	<url/>
 	<licenses>
@@ -66,6 +66,13 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		
+		<!-- OpenAPI 3 (Swagger) - Updated version to be compatible with Spring Boot 3.4.4 -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.8.6</version>
 		</dependency>
 	</dependencies>
 
