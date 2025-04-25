@@ -44,29 +44,29 @@ public class TransactionControllerTest {
 
         private ObjectMapper objectMapper = new ObjectMapper();
 
-        // 添加全局异常处理器
+        // Add global exception handler
         private ControllerExceptionHandler exceptionHandler = new ControllerExceptionHandler();
 
         @BeforeEach
         public void setup() {
                 MockitoAnnotations.openMocks(this);
 
-                // 创建一个ExceptionHandlerExceptionResolver用于处理控制器中的异常
+                // Create an ExceptionHandlerExceptionResolver to handle controller exceptions
                 ExceptionHandlerExceptionResolver exceptionResolver = new ExceptionHandlerExceptionResolver();
                 exceptionResolver.afterPropertiesSet();
 
                 mockMvc = MockMvcBuilders.standaloneSetup(transactionController)
-                                .setControllerAdvice(exceptionHandler) // 注册全局异常处理器
+                                .setControllerAdvice(exceptionHandler) // Register global exception handler
                                 .setHandlerExceptionResolvers(exceptionResolver)
                                 .build();
 
-                objectMapper.findAndRegisterModules(); // 为了正确处理LocalDateTime
+                objectMapper.findAndRegisterModules(); // For correct handling of LocalDateTime
         }
 
         @Test
-        @DisplayName("应该返回账户的所有交易")
+        @DisplayName("Should return all transactions for an account")
         public void should_return_all_transactions_for_account() throws Exception {
-                // 准备测试数据
+                // Prepare test data
                 Long accountId = 1L;
                 LocalDateTime now = LocalDateTime.now();
 
@@ -75,7 +75,7 @@ public class TransactionControllerTest {
                                                 .id(1L)
                                                 .transactionType(TransactionType.CREDIT)
                                                 .amount(BigDecimal.valueOf(1000))
-                                                .description("工资入账")
+                                                .description("Salary Deposit")
                                                 .transactionDate(now)
                                                 .accountId(accountId)
                                                 .build(),
@@ -83,15 +83,15 @@ public class TransactionControllerTest {
                                                 .id(2L)
                                                 .transactionType(TransactionType.DEBIT)
                                                 .amount(BigDecimal.valueOf(500))
-                                                .description("ATM取款")
+                                                .description("ATM Withdrawal")
                                                 .transactionDate(now)
                                                 .accountId(accountId)
                                                 .build());
 
-                // 模拟服务返回
+                // Mock service response
                 when(transactionService.getTransactionsByAccountId(accountId)).thenReturn(transactions);
 
-                // 执行测试并验证结果
+                // Execute test and verify results
                 mockMvc.perform(get("/api/v1/accounts/{accountId}/transactions", accountId)
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
@@ -99,44 +99,44 @@ public class TransactionControllerTest {
                                 .andExpect(jsonPath("$[0].id", is(1)))
                                 .andExpect(jsonPath("$[0].transactionType", is("CREDIT")))
                                 .andExpect(jsonPath("$[0].amount", is(1000)))
-                                .andExpect(jsonPath("$[0].description", is("工资入账")))
+                                .andExpect(jsonPath("$[0].description", is("Salary Deposit")))
                                 .andExpect(jsonPath("$[0].accountId", is(1)))
                                 .andExpect(jsonPath("$[1].id", is(2)))
                                 .andExpect(jsonPath("$[1].transactionType", is("DEBIT")))
                                 .andExpect(jsonPath("$[1].amount", is(500)))
-                                .andExpect(jsonPath("$[1].description", is("ATM取款")))
+                                .andExpect(jsonPath("$[1].description", is("ATM Withdrawal")))
                                 .andExpect(jsonPath("$[1].accountId", is(1)));
 
-                // 验证服务方法被调用
+                // Verify service method was called
                 verify(transactionService, times(1)).getTransactionsByAccountId(accountId);
         }
 
         @Test
-        @DisplayName("应该创建新交易")
+        @DisplayName("Should create a new transaction")
         public void should_create_new_transaction() throws Exception {
-                // 准备测试数据
+                // Prepare test data
                 Long accountId = 1L;
                 LocalDateTime now = LocalDateTime.now();
 
                 TransactionRequest request = new TransactionRequest();
                 request.setTransactionType(TransactionType.CREDIT);
                 request.setAmount(BigDecimal.valueOf(1000));
-                request.setDescription("工资入账");
+                request.setDescription("Salary Deposit");
 
                 TransactionResponse response = TransactionResponse.builder()
                                 .id(1L)
                                 .transactionType(TransactionType.CREDIT)
                                 .amount(BigDecimal.valueOf(1000))
-                                .description("工资入账")
+                                .description("Salary Deposit")
                                 .transactionDate(now)
                                 .accountId(accountId)
                                 .build();
 
-                // 模拟服务返回
+                // Mock service response
                 when(transactionService.createTransaction(eq(accountId), any(TransactionRequest.class)))
                                 .thenReturn(response);
 
-                // 执行测试并验证结果
+                // Execute test and verify results
                 mockMvc.perform(post("/api/v1/accounts/{accountId}/transactions", accountId)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -144,17 +144,17 @@ public class TransactionControllerTest {
                                 .andExpect(jsonPath("$.id", is(1)))
                                 .andExpect(jsonPath("$.transactionType", is("CREDIT")))
                                 .andExpect(jsonPath("$.amount", is(1000)))
-                                .andExpect(jsonPath("$.description", is("工资入账")))
+                                .andExpect(jsonPath("$.description", is("Salary Deposit")))
                                 .andExpect(jsonPath("$.accountId", is(1)));
 
-                // 验证服务方法被调用
+                // Verify service method was called
                 verify(transactionService, times(1)).createTransaction(eq(accountId), any(TransactionRequest.class));
         }
 
         @Test
-        @DisplayName("应该根据ID返回交易详情")
+        @DisplayName("Should return transaction details by ID")
         public void should_return_transaction_by_id() throws Exception {
-                // 准备测试数据
+                // Prepare test data
                 Long transactionId = 1L;
                 LocalDateTime now = LocalDateTime.now();
 
@@ -162,58 +162,58 @@ public class TransactionControllerTest {
                                 .id(transactionId)
                                 .transactionType(TransactionType.CREDIT)
                                 .amount(BigDecimal.valueOf(1000))
-                                .description("工资入账")
+                                .description("Salary Deposit")
                                 .transactionDate(now)
                                 .accountId(1L)
                                 .build();
 
-                // 模拟服务返回
+                // Mock service response
                 when(transactionService.getTransactionById(transactionId)).thenReturn(transaction);
 
-                // 执行测试并验证结果
+                // Execute test and verify results
                 mockMvc.perform(get("/api/v1/transactions/{id}", transactionId)
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.id", is(1)))
                                 .andExpect(jsonPath("$.transactionType", is("CREDIT")))
                                 .andExpect(jsonPath("$.amount", is(1000)))
-                                .andExpect(jsonPath("$.description", is("工资入账")))
+                                .andExpect(jsonPath("$.description", is("Salary Deposit")))
                                 .andExpect(jsonPath("$.accountId", is(1)));
 
-                // 验证服务方法被调用
+                // Verify service method was called
                 verify(transactionService, times(1)).getTransactionById(transactionId);
         }
 
         @Test
-        @DisplayName("创建交易时应验证请求数据")
+        @DisplayName("Should validate transaction request data")
         public void should_validate_transaction_request() throws Exception {
-                // 准备测试数据 - 无效请求，缺少必要字段
+                // Prepare test data - invalid request, missing required fields
                 Long accountId = 1L;
                 TransactionRequest request = new TransactionRequest();
-                // 故意不设置必要字段
+                // Intentionally not setting required fields
 
-                // 此测试只验证请求验证逻辑，不需要使用MockMvc
-                // 我们直接验证服务方法不会被调用
+                // This test only verifies request validation logic, no need to use MockMvc
+                // We directly verify that the service method will not be called
 
-                // 手动验证transactionType不能为空
+                // Manually verify transactionType cannot be null
                 if (request.getTransactionType() == null) {
-                        // 期望的行为
+                        // Expected behavior
                         assertTrue(true);
                 }
 
-                // 手动验证amount不能为空
+                // Manually verify amount cannot be null
                 if (request.getAmount() == null) {
-                        // 期望的行为
+                        // Expected behavior
                         assertTrue(true);
                 }
 
-                // 手动验证description不能为空
+                // Manually verify description cannot be empty
                 if (request.getDescription() == null || request.getDescription().isEmpty()) {
-                        // 期望的行为
+                        // Expected behavior
                         assertTrue(true);
                 }
 
-                // 验证服务方法从未被调用
+                // Verify service method was never called
                 verify(transactionService, never()).createTransaction(anyLong(), any(TransactionRequest.class));
         }
 }

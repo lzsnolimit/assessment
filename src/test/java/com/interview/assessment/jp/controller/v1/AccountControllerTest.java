@@ -36,27 +36,27 @@ public class AccountControllerTest {
         @InjectMocks
         private AccountController accountController;
 
-        // 添加全局异常处理器
+        // Add global exception handler
         private ControllerExceptionHandler exceptionHandler = new ControllerExceptionHandler();
 
         @BeforeEach
         public void setup() {
                 MockitoAnnotations.openMocks(this);
 
-                // 创建一个ExceptionHandlerExceptionResolver用于处理控制器中的异常
+                // Create an ExceptionHandlerExceptionResolver to handle controller exceptions
                 ExceptionHandlerExceptionResolver exceptionResolver = new ExceptionHandlerExceptionResolver();
                 exceptionResolver.afterPropertiesSet();
 
                 mockMvc = MockMvcBuilders.standaloneSetup(accountController)
-                                .setControllerAdvice(exceptionHandler) // 注册全局异常处理器
+                                .setControllerAdvice(exceptionHandler) // Register global exception handler
                                 .setHandlerExceptionResolvers(exceptionResolver)
                                 .build();
         }
 
         @Test
-        @DisplayName("应该返回当前用户的所有账户")
+        @DisplayName("Should return all accounts for current user")
         public void should_return_all_accounts_for_current_user() throws Exception {
-                // 准备测试数据
+                // Prepare test data
                 List<AccountResponse> accounts = Arrays.asList(
                                 AccountResponse.builder()
                                                 .id(1L)
@@ -71,10 +71,10 @@ public class AccountControllerTest {
                                                 .balance(BigDecimal.valueOf(3000))
                                                 .build());
 
-                // 模拟服务返回
+                // Mock service response
                 when(accountService.getAccountsByCurrentUser()).thenReturn(accounts);
 
-                // 执行测试并验证结果
+                // Execute test and verify results
                 mockMvc.perform(get("/api/v1/accounts")
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
@@ -88,14 +88,14 @@ public class AccountControllerTest {
                                 .andExpect(jsonPath("$[1].accountType", is("CHECKING")))
                                 .andExpect(jsonPath("$[1].balance", is(3000)));
 
-                // 验证服务方法被调用
+                // Verify service method was called
                 verify(accountService, times(1)).getAccountsByCurrentUser();
         }
 
         @Test
-        @DisplayName("应该根据ID返回账户详情")
+        @DisplayName("Should return account details by ID")
         public void should_return_account_by_id() throws Exception {
-                // 准备测试数据
+                // Prepare test data
                 Long accountId = 1L;
                 AccountResponse account = AccountResponse.builder()
                                 .id(accountId)
@@ -104,10 +104,10 @@ public class AccountControllerTest {
                                 .balance(BigDecimal.valueOf(5000))
                                 .build();
 
-                // 模拟服务返回
+                // Mock service response
                 when(accountService.getAccountById(accountId)).thenReturn(account);
 
-                // 执行测试并验证结果
+                // Execute test and verify results
                 mockMvc.perform(get("/api/v1/accounts/{id}", accountId)
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
@@ -116,31 +116,34 @@ public class AccountControllerTest {
                                 .andExpect(jsonPath("$.accountType", is("SAVINGS")))
                                 .andExpect(jsonPath("$.balance", is(5000)));
 
-                // 验证服务方法被调用
+                // Verify service method was called
                 verify(accountService, times(1)).getAccountById(accountId);
         }
 
         @Test
-        @DisplayName("当获取不存在的账户时应该处理异常")
+        @DisplayName("Should handle exception when account not found")
         public void should_handle_exception_when_account_not_found() throws Exception {
-                // 准备测试数据
+                // Prepare test data
                 Long accountId = 999L;
 
-                // 修改测试逻辑：如果服务层抛出异常，控制器层会传递异常给测试框架
-                // 这段测试将验证是否抛出了预期的异常类型，而不是验证响应状态
-                doThrow(new ResourceNotFoundException("账户不存在，ID: " + accountId))
+                // Modify test logic: if the service layer throws an exception, the controller
+                // layer will pass the exception to the test framework
+                // This test will verify whether the expected exception type is thrown, not the
+                // response status
+                doThrow(new ResourceNotFoundException("Account not found, ID: " + accountId))
                                 .when(accountService).getAccountById(accountId);
 
-                // 不调用mockMvc.perform，直接验证服务层方法会抛出异常
+                // Don't call mockMvc.perform, directly verify that the service layer method
+                // will throw an exception
                 try {
                         accountService.getAccountById(accountId);
                 } catch (ResourceNotFoundException ex) {
-                        // 预期会抛出ResourceNotFoundException
+                        // Expected to throw ResourceNotFoundException
                         verify(accountService, times(1)).getAccountById(accountId);
-                        return; // 测试通过
+                        return; // Test passed
                 }
 
-                // 如果没有抛出异常，测试失败
+                // If no exception is thrown, the test fails
                 fail("Expected ResourceNotFoundException was not thrown");
         }
 }

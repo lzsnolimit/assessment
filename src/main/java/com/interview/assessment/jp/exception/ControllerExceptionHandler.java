@@ -11,17 +11,17 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * 全局异常处理器
+ * Global Exception Handler
  */
 @ControllerAdvice
 public class ControllerExceptionHandler {
 
     /**
-     * 处理资源未找到异常
+     * Handle resource not found exception
      *
-     * @param ex      异常
-     * @param request Web请求
-     * @return 错误响应
+     * @param ex      Exception
+     * @param request Web request
+     * @return Error response
      */
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Object> handleResourceNotFoundException(
@@ -38,11 +38,11 @@ public class ControllerExceptionHandler {
     }
 
     /**
-     * 处理其他异常
+     * Handle other exceptions
      *
-     * @param ex      异常
-     * @param request Web请求
-     * @return 错误响应
+     * @param ex      Exception
+     * @param request Web request
+     * @return Error response
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGlobalException(

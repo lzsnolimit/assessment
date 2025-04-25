@@ -36,19 +36,20 @@ public class StatementController {
                         @PathVariable Integer year,
                         @PathVariable Integer month) {
 
-                // 生成简单的文本格式对账单
+                // Generate simple text format statement
                 StringBuilder statementBuilder = new StringBuilder();
-                statementBuilder.append("账户对账单\n");
+                statementBuilder.append("Account Statement\n");
                 statementBuilder.append("========================\n");
-                statementBuilder.append("账户ID: ").append(accountId).append("\n");
-                statementBuilder.append("对账期间: ").append(year).append("年").append(month).append("月\n");
+                statementBuilder.append("Account ID: ").append(accountId).append("\n");
+                statementBuilder.append("Statement Period: ").append(year).append(" year ").append(month)
+                                .append(" month\n");
                 statementBuilder.append("========================\n\n");
-                statementBuilder.append("交易明细:\n");
-                statementBuilder.append("1. 2023-01-01 - 入账 - ¥1000.00 - 工资入账\n");
-                statementBuilder.append("2. 2023-01-05 - 出账 - ¥200.00 - 超市购物\n");
-                statementBuilder.append("3. 2023-01-15 - 出账 - ¥500.00 - 房租\n");
+                statementBuilder.append("Transaction Details:\n");
+                statementBuilder.append("1. 2023-01-01 - Deposit - $1000.00 - Salary Deposit\n");
+                statementBuilder.append("2. 2023-01-05 - Withdrawal - $200.00 - Supermarket Shopping\n");
+                statementBuilder.append("3. 2023-01-15 - Withdrawal - $500.00 - Rent\n");
                 statementBuilder.append("========================\n");
-                statementBuilder.append("期末余额: ¥8000.00\n");
+                statementBuilder.append("Ending Balance: $8000.00\n");
 
                 byte[] data = statementBuilder.toString().getBytes();
                 ByteArrayResource resource = new ByteArrayResource(data);

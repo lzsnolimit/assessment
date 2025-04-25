@@ -52,26 +52,26 @@ public class AccountServiceImplTest {
         MockitoAnnotations.openMocks(this);
         SecurityContextHolder.setContext(securityContext);
 
-        // 创建测试用户
+        // Create test user
         testUser = User.builder()
                 .id(1L)
                 .username("testuser")
                 .password("password")
                 .build();
 
-        // 模拟安全上下文
+        // Mock security context
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn(testUser.getUsername());
         when(userRepository.findByUsername(testUser.getUsername())).thenReturn(Optional.of(testUser));
 
-        // 模拟MockDataService
+        // Mock MockDataService
         when(mockDataService.getCurrentUser()).thenReturn(testUser);
     }
 
     @Test
-    @DisplayName("应该返回当前用户的所有账户")
+    @DisplayName("Should return all accounts for current user")
     public void should_return_all_accounts_for_current_user() {
-        // 准备测试数据
+        // Prepare test data
         User user = testUser;
 
         Account account1 = Account.builder()
@@ -92,14 +92,14 @@ public class AccountServiceImplTest {
 
         List<Account> accounts = Arrays.asList(account1, account2);
 
-        // 模拟仓库返回
+        // Mock repository response
         when(accountRepository.findByUser(user)).thenReturn(accounts);
         when(mockDataService.getAccountsByUserId(user.getId())).thenReturn(accounts);
 
-        // 执行测试
+        // Execute test
         List<AccountResponse> result = accountService.getAccountsByCurrentUser();
 
-        // 验证结果
+        // Verify results
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals(1L, result.get(0).getId());
@@ -113,9 +113,9 @@ public class AccountServiceImplTest {
     }
 
     @Test
-    @DisplayName("应该根据ID返回账户")
+    @DisplayName("Should return account by ID")
     public void should_return_account_by_id() {
-        // 准备测试数据
+        // Prepare test data
         Long accountId = 1L;
         User user = testUser;
 
@@ -127,14 +127,14 @@ public class AccountServiceImplTest {
                 .user(user)
                 .build();
 
-        // 模拟仓库返回
+        // Mock repository response
         when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
         when(mockDataService.getAccountById(accountId)).thenReturn(account);
 
-        // 执行测试
+        // Execute test
         AccountResponse result = accountService.getAccountById(accountId);
 
-        // 验证结果
+        // Verify results
         assertNotNull(result);
         assertEquals(accountId, result.getId());
         assertEquals("100000001", result.getAccountNumber());
@@ -143,36 +143,36 @@ public class AccountServiceImplTest {
     }
 
     @Test
-    @DisplayName("当账户不存在时应该抛出异常")
+    @DisplayName("Should throw exception when account not found")
     public void should_throw_exception_when_account_not_found() {
-        // 准备测试数据
+        // Prepare test data
         Long accountId = 999L;
 
-        // 模拟仓库返回
+        // Mock repository response
         when(accountRepository.findById(accountId)).thenReturn(Optional.empty());
         when(mockDataService.getAccountById(accountId)).thenReturn(null);
 
-        // 执行测试并验证结果
+        // Execute test and verify results
         assertThrows(ResourceNotFoundException.class, () -> {
             accountService.getAccountById(accountId);
         });
     }
 
     @Test
-    @DisplayName("当没有找到账户时应该返回空列表")
+    @DisplayName("Should return empty list when no accounts found")
     public void should_return_empty_list_when_no_accounts_found() {
-        // 准备测试数据
+        // Prepare test data
         User user = testUser;
 
-        // 模拟仓库返回
+        // Mock repository response
         when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
         when(accountRepository.findByUser(user)).thenReturn(List.of());
         when(mockDataService.getAccountsByUserId(user.getId())).thenReturn(List.of());
 
-        // 执行测试
+        // Execute test
         List<AccountResponse> result = accountService.getAccountsByCurrentUser();
 
-        // 验证结果
+        // Verify results
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
